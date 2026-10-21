@@ -1692,7 +1692,7 @@
 <nav id="dock" aria-label="Sections"></nav>
 <canvas id="fx" class="pointer-events-none fixed inset-0 z-[140]"></canvas>
 
-<script>window.EG_BUILD='85b920285921d697';</script>
+<script>window.EG_BUILD='e6a601c7c121e6a6';</script>
 <script type="text/x-eg-app" id="egApp">
 /* ═══════════════════════════ UTILS ═══════════════════════════ */
 const $ = s => document.querySelector(s);
@@ -4255,6 +4255,21 @@ refreshIcons();
 const ACCESS_AREAS=[['words','Word Cards','layers'],['rules','Magic Rules','wand-sparkles'],['board',"Teacher's Board",'presentation']];
 const egEsc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const egTimeout=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),ms))]);
+const egSlow=()=>new Error('The internet is slow right now, so your lessons took too long to download. Check your connection and press Try again.');
+// reads go over plain HTTPS first: one compressed download, much faster than the live socket on a slow connection; the socket is the fallback
+async function egRead(path,ms){
+  try{
+    const tok=await EG.auth.currentUser.getIdToken(), ctl=new AbortController(), to=setTimeout(()=>ctl.abort(),ms);
+    try{
+      const r=await fetch(`${EG.config.databaseURL}/${path}.json?auth=${encodeURIComponent(tok)}`,{signal:ctl.signal,cache:'no-store'});
+      if(!r.ok) throw new Error('http '+r.status);
+      return await r.json();
+    } finally { clearTimeout(to); }
+  }catch(e){
+    try{ return (await egTimeout(EG.db.ref(path).once('value'),ms)).val(); }
+    catch(e2){ throw e2.message==='timeout'?egSlow():e2; }
+  }
+}
 const egGet=(k)=>{ try{ return localStorage.getItem(k); }catch(e){ return null; } };
 const egSet=(k,v)=>{ try{ v==null?localStorage.removeItem(k):localStorage.setItem(k,v); }catch(e){} };
 // access objects look like {all:true} or {sections:{words:true}, games:{quiz:true}, lessons:{ps1:true}, papers:{pp1:true}}
@@ -4342,9 +4357,9 @@ const Gate={
     }
     if(this.admin){ this.acc={all:true}; this.rec={name:'Teacher',username:u.email}; egQ('#egAdminBtn').classList.remove('hidden'); }
     else{
-      const rec=(await egTimeout(EG.db.ref('users/'+u.uid).once('value'),9000)).val();
+      const rec=await egRead('users/'+u.uid,20000);
       if(!rec || rec.active!==true){ this.leaving=true; await EG.auth.signOut(); return this.toLogin(rec?'Your account is switched off. Please ask your teacher.':'This account is not set up yet. Please ask your teacher.'); }
-      this.rec=rec; this.acc=(await egTimeout(EG.db.ref('access/'+u.uid).once('value'),9000)).val()||{};
+      this.rec=rec; this.acc=(await egRead('access/'+u.uid,20000))||{};
       EG.db.ref('users/'+u.uid+'/active').on('value',s=>{ if(s.val()!==true) this.logout('Your account was switched off. Please ask your teacher.'); });
     }
     egQ('#egUserName').textContent=(this.rec.name||'Me').split(' ')[0]+' · Log out';
@@ -4379,7 +4394,7 @@ const Idle={
 // the protected content lives in the database; each account can read only what it was given (see database.rules.json)
 const Vault={
   async load(admin,acc){
-    const one=p=>egTimeout(EG.db.ref(p).once('value'),20000).then(s=>s.val());
+    const one=p=>egRead(p,60000);
     const meta=await one('content/meta');
     if(!meta) throw Object.assign(new Error(admin?'Upload content-pack.json to publish the lessons, games and papers.':'Your teacher has not published the lessons yet. Please try again later.'),{noContent:true});
     if(meta.buildId!==window.EG_BUILD) throw Object.assign(new Error(admin?'The uploaded content pack is from a different build of the app. Run "node build.mjs" and upload the new content-pack.json.':'The lessons are being updated. Please try again in a few minutes.'),{noContent:true});
