@@ -165,6 +165,11 @@ h1 .u::after{content:'';position:absolute;left:-2%;right:-2%;bottom:-.12em;heigh
 .steps h3{font-size:1.3rem;margin-top:6px}
 .steps p{margin-top:8px;color:var(--ink2)}
 
+.topics{padding-block:clamp(64px,8vw,100px)}
+.contents{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px 36px}
+.cGroup h3{font-size:1.2rem;padding-bottom:8px;border-bottom:2px solid var(--ink)}
+.cGroup ul{list-style:none;margin:0;padding:0}
+.cGroup li{padding:7px 0 6px;border-bottom:1px dashed var(--rule);color:var(--ink2);font-size:.98rem;line-height:1.4}
 .faq{padding-block:clamp(64px,8vw,100px)}
 .faqs{max-width:820px;border-top:2px solid var(--ink)}
 details{border-bottom:1px solid var(--line)}
@@ -215,7 +220,7 @@ details p{padding:0 0 22px;color:var(--ink2);max-width:40em}
   .ruler::before{left:0;right:auto;top:0;bottom:0;width:40px;height:auto;
     background:repeating-linear-gradient(180deg,var(--ink) 0 1.5px,transparent 1.5px 12px) left top/10px 100% no-repeat,repeating-linear-gradient(180deg,var(--ink) 0 2px,transparent 2px 60px) left top/18px 100% no-repeat,#FFF8D6}
   .mk{top:0;left:-70px;min-width:40px}
-  .ticks{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ticks,.contents{grid-template-columns:repeat(2,minmax(0,1fr))}
   .footIn{grid-template-columns:1fr 1fr}
 }
 @media (max-width:860px){
@@ -239,7 +244,7 @@ details p{padding:0 0 22px;color:var(--ink2);max-width:40em}
   .heroShots .side{width:66%;left:-2%}
   .note.n1{position:static;margin-top:14px;font-size:24px;text-align:right}
   .note.n1::before{display:none}
-  .ticks,.steps{grid-template-columns:1fr}
+  .ticks,.steps,.contents{grid-template-columns:1fr}
   .bento{gap:22px 14px}
   .gm.big{grid-column:span 2;grid-row:auto}
   .gm b{font-size:1rem}.gm.big b{font-size:1.2rem}

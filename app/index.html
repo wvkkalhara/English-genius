@@ -941,6 +941,32 @@
   .bdQOpt.ok{background:#22C55E;border:3px solid #BBF7D0}
   .bdQOpt.no{background:#DC2626;border:3px solid #FECACA}
   .bdQScore{text-align:center;font:700 5rem 'Caveat',cursive;color:#FDE047;margin-top:10px}
+  /* lesson notes: an exercise-book page */
+  .nbWrap{padding:14px}
+  .nbHint{text-align:center;font:600 15px 'Fredoka',sans-serif;color:#B45309;margin-bottom:8px}
+  .nbPage{position:relative;max-width:760px;margin:0 auto;padding:22px 22px 26px 64px;background:#fff linear-gradient(transparent 31px,#DCE7F3 31px) 0 6px/100% 32px;border-radius:6px;box-shadow:0 2px 0 #E5E7EB,0 18px 36px -20px rgba(30,27,75,.5);font:600 16px/32px 'Nunito',sans-serif;color:#1E293B}
+  .nbPage::before{content:'';position:absolute;top:0;bottom:0;left:44px;width:5px;border-left:1.5px solid #E2484D;border-right:1.5px solid #E2484D;opacity:.7}
+  .nbDate{text-align:right;font:600 20px/32px 'Caveat',cursive;color:#475569}
+  .nbDate span{display:inline-block;width:110px;border-bottom:1.5px solid #475569}
+  .nbTitle{font:700 24px/32px 'Fredoka',sans-serif;color:#1E3A8A;text-decoration:underline;text-decoration-color:#E2484D;text-underline-offset:6px}
+  .nbSub{color:#64748B;font-style:italic}
+  .nbPage h3{font:700 18px/32px 'Fredoka',sans-serif;color:#B91C1C;margin-top:8px}
+  .nbRule{margin:6px 0;padding:6px 12px;border:2px solid #1E3A8A;border-radius:4px;background:#EFF6FF;font-weight:800;color:#1E3A8A;line-height:26px}
+  .nbList{margin:0;padding-left:26px;list-style:decimal}
+  .nbList li::marker{color:#B91C1C;font-weight:800}
+  .nbEx{margin:0;padding-left:20px;list-style:'→ '}
+  .nbPage u{text-decoration-color:#E2484D;text-decoration-thickness:2px;text-underline-offset:3px}
+  .nbWords,.nbMist{border-collapse:collapse;width:100%;line-height:24px}
+  .nbWords th{width:1%;text-align:left;padding:4px 18px 4px 0;color:#1E3A8A;white-space:nowrap;vertical-align:top}
+  .nbWords td,.nbMist td{padding:4px 8px;vertical-align:top}
+  .nbMist td.no{color:#B91C1C;text-decoration:line-through;text-decoration-color:rgba(185,28,28,.5);width:45%}
+  .nbMist td.ok{color:#15803D}
+  .nbTip{margin:8px 0;padding:4px 12px;background:#FEF9C3;border-left:5px solid #FACC15;line-height:26px}
+  .nbTip b{color:#B45309}
+  .nbQ .gap{color:#94A3B8}
+  .nbAns summary{cursor:pointer;color:#7C3AED;font-weight:800}
+  .nbTask{font-weight:700}
+  @media (max-width:640px){ .nbPage{padding:16px 12px 20px 40px;font-size:15px} .nbPage::before{left:26px} .nbMist td{display:block;width:auto!important} }
   .lpChalkWrap{padding:10px}
   .lpChalkTabs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:8px}
   .lpChalkTabs .bdTab{color:#3730A3;background:#E0E7FF;border-color:#C7D2FE}
@@ -1628,6 +1654,7 @@
           <div class="hidden w-36 sm:block">
             <div class="tbar !border-white/40 !bg-white/25"><div id="lpFill" class="tfill" style="width:0%"></div></div>
           </div>
+          <button id="lpNotesBtn" class="candy candy-amber candy-sm" title="Notes to copy into your book">📒 Notes</button>
           <button id="lpChalkBtn" class="candy candy-green candy-sm" title="Open the chalkboard for this lesson">🧑‍🏫 Board</button>
           <div id="lpCount" class="rounded-full bg-white/20 px-3 py-1 font-display text-sm font-semibold text-white">1/1</div>
           <button id="lpClose" class="candy candy-amber candy-sm" aria-label="Close lesson"><i data-lucide="x" class="h-4 w-4"></i></button>
@@ -1665,7 +1692,7 @@
 <nav id="dock" aria-label="Sections"></nav>
 <canvas id="fx" class="pointer-events-none fixed inset-0 z-[140]"></canvas>
 
-<script>window.EG_BUILD='34a254877a141793';</script>
+<script>window.EG_BUILD='85b920285921d697';</script>
 <script type="text/x-eg-app" id="egApp">
 /* ═══════════════════════════ UTILS ═══════════════════════════ */
 const $ = s => document.querySelector(s);
@@ -2761,6 +2788,9 @@ const LPlayer={
     if(L.exam) L.steps=buildExam(L);   // a brand-new mock exam every time
     // every normal lesson gets its chalkboard right after the first slide
     if(!L.exam&&!L.castle&&L.steps.length>1&&!L.steps.some(x=>x.k==='chalk')) L.steps.splice(1,0,{k:'chalk'});
+    // the notes page sits just before the finish, so students copy it once they understand the lesson
+    if(!L.exam&&!L.castle&&notesHTML(L)&&!L.steps.some(x=>x.k==='notes')){ const last=L.steps[L.steps.length-1]; L.steps.splice(last&&last.k==='diploma'?L.steps.length-1:L.steps.length,0,{k:'notes'}); }
+    $('#lpNotesBtn').classList.toggle('hidden',!L.steps.some(x=>x.k==='notes'));
     $('#lpChalkBtn').classList.toggle('hidden',!L.steps.some(x=>x.k==='chalk'));
     $('#lpTitle').textContent=(L.castle?'BOSS LEVEL · ':'Lesson '+lessonNum(L)+' · ')+L.title;
     $('#lpSub').textContent=LESSONS[li].blurb;
@@ -2918,6 +2948,9 @@ const LPlayer={
         if(a.dataset.act==='copy'){ try{ navigator.clipboard.writeText(all()); toast('📋 Copied!'); }catch(err){ toast('Select the text and copy it.'); } }
         if(a.dataset.act==='print'){ const w=open('','_blank'); if(w){ w.document.write(`<title>My writing</title><body style="font-family:sans-serif;max-width:700px;margin:40px auto;line-height:1.6"><p><i>${st.task}</i></p>${all().split('\n\n').map(p=>`<p>${p.replace(/</g,'&lt;')}</p>`).join('')}</body>`); w.document.close(); w.print(); } } });
       this.wrDone=false; upd();
+    } else if(st.k==='notes'){
+      const L=LESSONS[this.li]; st.say='Copy these notes into your exercise book. Write the date, underline the title, and draw the boxes.';
+      body.innerHTML=`<div class="nbWrap"><p class="nbHint">📒 Copy this page into your exercise book.</p>${notesHTML(L)}</div>`;
     } else if(st.k==='chalk'){
       const L=LESSONS[this.li], bs=lessonBoards(L); st.say=chalkPlain(bs[0].tip||L.blurb||'');
       body.innerHTML=`<div class="lpChalkWrap"><div class="lpChalkTabs">${bs.map((B,i)=>`<button class="bdTab ${i?'':'on'}" data-bi="${i}">${B.e} ${B.title.split(':')[0]}</button>`).join('')}</div><div class="lpChalk"></div></div>`;
@@ -3003,6 +3036,7 @@ $('#lpNext').addEventListener('click', ()=>LPlayer.next());
 $('#lpBody').addEventListener('click', e=>{ const b=e.target.closest('.phr'); if(!b) return; SFX.pop(); sayAloud(b.dataset.say,.9); b.classList.remove('ping'); void b.offsetWidth; b.classList.add('ping'); });
 $('#lpPrev').addEventListener('click', ()=>LPlayer.prev());
 $('#lpRead').addEventListener('click', ()=>LPlayer.read());
+$('#lpNotesBtn').addEventListener('click', ()=>{ const k=LESSONS[LPlayer.li].steps.findIndex(x=>x.k==='notes'); if(k>=0){ SFX.click(); LPlayer.si=k; LPlayer.show(); } });
 $('#lpChalkBtn').addEventListener('click', ()=>{ const k=LESSONS[LPlayer.li].steps.findIndex(x=>x.k==='chalk'); if(k>=0){ SFX.click(); LPlayer.si=k; LPlayer.show(); } });
 $('#lpClose').addEventListener('click', ()=>{ SFX.click(); LPlayer.close(); });
 addEventListener('keydown', e=>{ if(e.key==='Escape' && !$('#lessonOverlay').classList.contains('hidden')) LPlayer.close(); });
@@ -3030,23 +3064,23 @@ const CONFIG={
   invaders:{total:8,music:'space'}, maze:{total:6,music:'adventure'}, grandprix:{total:10,hearts:false,music:'race'}, wordsearch:{total:6,hearts:false,music:'calm'}, bowling:{total:8,music:'happy'}, islands:{total:10,music:'adventure'},
   chat:{total:6,hearts:false,music:'calm'}, echo:{total:6,hearts:false,music:'calm'}, interview:{total:5,hearts:false,music:'happy'}, picture:{total:5,hearts:false,music:'calm'}
 };
-/*@@G221@@*/function buildEscape(){}/*@@/G@@*/
-/*@@G222@@*/function buildCastle(){}/*@@/G@@*/
-/*@@G223@@*/function buildAsteroids(){}/*@@/G@@*/
-/*@@G224@@*/function buildDuel(){}/*@@/G@@*/
+/*@@G222@@*/function buildEscape(){}/*@@/G@@*/
+/*@@G223@@*/function buildCastle(){}/*@@/G@@*/
+/*@@G224@@*/function buildAsteroids(){}/*@@/G@@*/
+/*@@G225@@*/function buildDuel(){}/*@@/G@@*/
 Object.assign(BUILDERS,{escape:buildEscape,castle:buildCastle,asteroids:buildAsteroids,duel:buildDuel});
 Object.assign(HELLOS,{escape:'The door is locked… find the keys!',castle:'Man the cannons!',asteroids:'Shields up, space cadet!',duel:'Robo-Rival wants a duel!'});
 Object.assign(CONFIG,{escape:{total:6,music:'adventure'},castle:{total:10,music:'race'},asteroids:{total:8,music:'space'},duel:{total:9,hearts:false,music:'happy'}});
 
 /* ══════════════ NINJA KIT — a small tile platformer shared by Word Ninja and Fruit Ninja Quest ══════════════
    map chars: '#' ground · '=' one-way plank (jump up through, tap ↓ to drop) · '~' water · ' ' air (fall off the map = ouch) */
-/*@@G228@@*/var NJ;/*@@/G@@*/
-/*@@G229@@*/function buildNinjaRun(){}/*@@/G@@*/
-/*@@G230@@*/function buildFruitQuest(){}/*@@/G@@*/
+/*@@G229@@*/var NJ;/*@@/G@@*/
+/*@@G230@@*/function buildNinjaRun(){}/*@@/G@@*/
+/*@@G231@@*/function buildFruitQuest(){}/*@@/G@@*/
 Object.assign(BUILDERS,{ninja:buildNinjaRun,fruitquest:buildFruitQuest});
 Object.assign(HELLOS,{ninja:'Ninja! Find the right word!',fruitquest:'Slice the fruits in order!'});
 Object.assign(CONFIG,{ninja:{total:8,music:'adventure'},fruitquest:{total:4,music:'adventure'}});
-/*@@G234@@*/function buildMiner(){}/*@@/G@@*/
+/*@@G235@@*/function buildMiner(){}/*@@/G@@*/
 Object.assign(BUILDERS,{miner:buildMiner});
 Object.assign(HELLOS,{miner:"Grab your pickaxe — time to dig!"});
 Object.assign(CONFIG,{miner:{total:6,music:'adventure'}});
@@ -3345,6 +3379,33 @@ const VerbExplorer={
 };
 
 SpellBook.init(); SentenceLab.init(); VerbExplorer.init();
+/* ═══════════════════════════ LESSON NOTES: what students copy into their exercise books ═══════════════════════════
+   *word* = underline it. Practice questions come from each lesson's own question bank. */
+
+const LESSON_NOTES=__VAULT.notes;
+// a lesson's notes as an exercise-book page, ready to copy by hand
+function notesHTML(L){
+  const N=L.notes||(typeof LESSON_NOTES!=='undefined'&&LESSON_NOTES[L.id]); if(!N) return '';
+  const e=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const hl=s=>e(s).replace(/\*([^*]+)\*/g,'<u>$1</u>');
+  const fill=((L.bank&&L.bank.fill)||[]).slice(), qs=[];
+  for(let i=0;i<fill.length&&qs.length<5;i+=Math.max(1,Math.floor(fill.length/5))) qs.push(fill[i]);
+  return `<article class="nbPage">
+    <p class="nbDate">Date: <span></span></p>
+    <h2 class="nbTitle">${e(L.title)}</h2>
+    ${L.blurb?`<p class="nbSub">${e(L.blurb)}</p>`:''}
+    ${N.rule?`<div class="nbRule">${hl(N.rule)}</div>`:''}
+    ${N.points&&N.points.length?`<h3>Key points</h3><ol class="nbList">${N.points.map(p=>`<li>${hl(p)}</li>`).join('')}</ol>`:''}
+    ${N.ex&&N.ex.length?`<h3>Examples</h3><ul class="nbEx">${N.ex.map(x=>`<li>${hl(x)}</li>`).join('')}</ul>`:''}
+    ${N.words&&N.words.length?`<h3>New words</h3><table class="nbWords">${N.words.map(([w,m])=>`<tr><th>${e(w)}</th><td>${e(m)}</td></tr>`).join('')}</table>`:''}
+    ${N.mistakes&&N.mistakes.length?`<h3>Common mistakes</h3><table class="nbMist">${N.mistakes.map(([b,g])=>`<tr><td class="no">✗ ${e(b)}</td><td class="ok">✓ ${hl(g)}</td></tr>`).join('')}</table>`:''}
+    ${N.tip?`<p class="nbTip"><b>Remember!</b> ${hl(N.tip)}</p>`:''}
+    ${qs.length?`<h3>Practice</h3><ol class="nbList nbQ">${qs.map(q=>`<li>${e(q.s).replace('___','<span class="gap">________</span>')}</li>`).join('')}</ol>
+      <details class="nbAns"><summary>Show answers</summary><p>${qs.map((q,i)=>`${i+1}. ${e(q.a)}`).join(' · ')}</p></details>`:''}
+    ${N.task?`<h3>Practice</h3><p class="nbTask">✍️ ${hl(N.task)}</p>`:''}
+  </article>`;
+}
+
 /* ═══════════════════════════ TEACHER'S BOARD: chalkboard tricks to teach a class ═══════════════════════════
 
    Markup in texts: {s:subject} {a:helper/key} {v:verb} {o:object} {t:time} {n:note} — each gets its own chalk colour.
