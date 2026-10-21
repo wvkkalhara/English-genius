@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /app/
 
-Sitemap: https://englishgenius.pages.dev/sitemap.xml
+Sitemap: https://englishgenius.campusflow.cc/sitemap.xml

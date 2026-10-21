@@ -1,1 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#fff"/><path d="M0 22h64M0 31h64M0 40h64M0 49h64" stroke="#DCE7F3" stroke-width="1.5"/><path d="M11 0v64M13.5 0v64" stroke="#E2484D" stroke-width="1.5"/><path d="M19 33l9 9 20-23" fill="none" stroke="#D63B3B" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#FFD43B"/><svg x="56" y="40" width="400" height="440" viewBox="0 0 240 260">
+    <line x1="120" y1="30" x2="120" y2="60" stroke="#6D28D9" stroke-width="7" stroke-linecap="round"/>
+    <path class="antStar" d="M120 8 l6 11 12 1.6 -8.8 8.4 2.2 12 -11.4-6 -11.4 6 2.2-12 -8.8-8.4 12-1.6z" fill="#FBBF24" stroke="#F59E0B" stroke-width="2"/>
+    <path d="M70 66 Q50 40 34 34 Q42 60 58 70 Z" fill="#A78BFA"/>
+    <path d="M170 66 Q190 40 206 34 Q198 60 182 70 Z" fill="#A78BFA"/>
+    <ellipse cx="120" cy="160" rx="88" ry="94" fill="#8B5CF6"/>
+    <ellipse cx="120" cy="192" rx="50" ry="44" fill="#DDD6FE"/>
+    <g class="eyes">
+      <circle cx="88" cy="126" r="23" fill="#fff"/>
+      <circle cx="152" cy="124" r="26" fill="#fff"/>
+      <g class="pupils">
+        <circle class="pupil" cx="92" cy="128" r="9.5" fill="#241257"/>
+        <circle class="pupil" cx="156" cy="126" r="10.5" fill="#241257"/>
+        <circle cx="95.5" cy="124.5" r="3.2" fill="#fff"/>
+        <circle cx="160" cy="122" r="3.6" fill="#fff"/>
+      </g>
+    </g>
+    <circle cx="64" cy="158" r="10" fill="#F9A8D4" opacity=".85"/>
+    <circle cx="176" cy="158" r="10" fill="#F9A8D4" opacity=".85"/>
+    <path class="mouth" d="M90 166 Q120 192 150 166 Q146 192 120 192 Q94 192 90 166 Z" fill="#4C1D95"/>
+    <path d="M104 186 Q120 194 136 186 Q132 198 120 198 Q108 198 104 186 Z" fill="#FB7185"/>
+    <path d="M102 168 l6 10 6-10 Z" fill="#fff"/>
+    <path d="M126 168 l6 10 6-10 Z" fill="#fff"/>
+    <path d="M36 158 Q10 166 12 190 Q28 194 38 178 Z" fill="#8B5CF6"/>
+    <path class="armR" d="M204 158 Q230 166 228 190 Q212 194 202 178 Z" fill="#8B5CF6"/>
+    <ellipse cx="88" cy="250" rx="22" ry="9" fill="#5B21B6"/>
+    <ellipse cx="152" cy="250" rx="22" ry="9" fill="#5B21B6"/>
+  </svg></svg>
