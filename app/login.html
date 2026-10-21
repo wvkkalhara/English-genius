@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="../favicon.ico" sizes="32x32"><link rel="apple-touch-icon" href="../assets/icon-180.png"><link rel="manifest" href="../manifest.webmanifest"><meta name="theme-color" content="#1E1B4B">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Genius · Log in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" integrity="sha384-AQ3POAMqIhwS81FrUH95ekxqBZHeP5tG2JfEL3+7GuTtfRLWnrRh32UxwzM+//A9" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js" integrity="sha384-TnlRYaR4JYz/lpaGuaiU61PjNberSA4vjLjtF+oRC/IkohkJqnWxw5EmDSOt1vA1" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js" integrity="sha384-1/m+A1jVWbD3yiK3/vtFvm1+LjK1WLpSoDY+Kaxppwn/yP9BVSgdHTNQVOjrzUO5" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js" integrity="sha384-E3vxFxXu8FhW5kvqdQJ5Yf8ugrV7iCJP8jgnItRH2Rk8Q08cJzJGTi/oMC3FEp3j" crossorigin="anonymous"></script>
+<script src="firebase-config.js"></script>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;font-family:'Nunito',sans-serif;color:#241257;display:grid;place-items:center;padding:24px 16px;
+    background:radial-gradient(circle at 15% 20%,#FFD3E8 0,transparent 40%),radial-gradient(circle at 85% 80%,#BAE6FD 0,transparent 45%),linear-gradient(160deg,#E9D5FF,#C7D2FE 55%,#A5F3FC)}
+  .stars span{position:fixed;font-size:28px;opacity:.55;animation:bob 6s ease-in-out infinite;pointer-events:none}
+  @keyframes bob{50%{transform:translateY(-14px) rotate(8deg)}}
+  .card{width:min(420px,100%);background:#fff;border-radius:32px;padding:32px 28px 26px;box-shadow:0 24px 60px -20px rgba(76,29,149,.45),0 0 0 6px rgba(255,255,255,.6);position:relative}
+  .logo{width:84px;height:84px;margin:-74px auto 8px;border-radius:28px;display:grid;place-items:center;font-size:44px;
+    background:linear-gradient(150deg,#FF5DA2,#7C3AED);box-shadow:0 12px 26px -8px rgba(124,58,237,.7);border:5px solid #fff}
+  h1{font-family:'Fredoka',sans-serif;font-size:34px;line-height:1;margin:6px 0 4px;text-align:center;
+    background:linear-gradient(90deg,#DB2777,#7C3AED);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{text-align:center;margin:0 0 22px;font-weight:700;color:#7C6BB3}
+  label{display:block;font-family:'Fredoka',sans-serif;font-weight:600;margin:14px 0 6px;color:#4C1D95}
+  .inp{position:relative}
+  input{width:100%;font:700 17px 'Nunito',sans-serif;color:#241257;padding:14px 16px;border-radius:16px;border:3px solid #E9D5FF;background:#FAF5FF;outline:none;transition:.15s}
+  input:focus{border-color:#8B5CF6;background:#fff;box-shadow:0 0 0 4px #EDE9FE}
+  .eye{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:none;font-size:20px;cursor:pointer;padding:6px}
+  .btn{width:100%;margin-top:22px;border:0;border-radius:18px;padding:15px;font:700 20px 'Fredoka',sans-serif;color:#fff;cursor:pointer;
+    background:linear-gradient(180deg,#4ADE80,#16A34A);box-shadow:0 6px 0 #15803D,0 12px 20px -8px rgba(22,163,74,.6);transition:transform .1s}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #15803D}
+  .btn[disabled]{filter:grayscale(.6);opacity:.7;cursor:wait}
+  .btn.purple{background:linear-gradient(180deg,#A78BFA,#7C3AED);box-shadow:0 6px 0 #5B21B6}
+  .msg{margin-top:14px;padding:11px 14px;border-radius:14px;font-weight:800;font-size:15px;display:none}
+  .msg.err{display:block;background:#FEE2E2;color:#B91C1C}
+  .msg.ok{display:block;background:#DCFCE7;color:#15803D}
+  .links{display:flex;justify-content:space-between;gap:10px;margin-top:16px;font-size:14px;font-weight:800}
+  .links a{color:#7C3AED;cursor:pointer;text-decoration:none}
+  .links a:hover{text-decoration:underline}
+  .hint{margin:18px 0 0;text-align:center;font-size:13.5px;font-weight:700;color:#8B7FB8}
+  .hidden{display:none!important}
+  .back{display:inline-block;margin-top:14px;font-weight:800;color:#7C3AED;cursor:pointer}
+  .home{position:fixed;left:16px;top:14px;font-weight:800;color:#4C1D95;text-decoration:none;background:rgba(255,255,255,.75);padding:8px 14px;border-radius:999px}
+  .waLink{color:#15803D;font-weight:900;text-decoration:none;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="stars"><span style="left:6%;top:12%">⭐</span><span style="right:8%;top:16%;animation-delay:1s">📚</span><span style="left:10%;bottom:14%;animation-delay:2s">🎮</span><span style="right:12%;bottom:10%;animation-delay:3s">✏️</span></div>
+
+<a class="home" href="../">← English Genius website</a>
+<main class="card">
+  <div class="logo">🦉</div>
+  <h1>English Genius</h1>
+  <p class="sub" id="sub">Log in to play, learn and win stars!</p>
+
+  <!-- sign in -->
+  <form id="loginForm" autocomplete="on">
+    <label for="who">Username</label>
+    <div class="inp"><input id="who" name="username" autocomplete="username" placeholder="your username" maxlength="80" required></div>
+    <label for="pw">Password</label>
+    <div class="inp"><input id="pw" type="password" name="password" autocomplete="current-password" placeholder="••••••••" maxlength="128" required>
+      <button type="button" class="eye" data-eye="pw" aria-label="Show password">👁️</button></div>
+    <button class="btn" id="goBtn">Let's go! 🚀</button>
+    <div class="msg" id="msg" role="alert"></div>
+    <div class="links"><a id="forgotLink">Forgot password?</a><a id="setupLink">Teacher: first-time setup</a></div>
+    <p class="hint">No account yet? <a class="waLink" id="waLink" href="https://wa.me/94722816456?text=Hi!%20I%20would%20like%20to%20join%20English%20Genius." target="_blank" rel="noopener">💬 WhatsApp <span id="waNum">072 281 6456</span></a> and we will make one for you.</p>
+  </form>
+
+  <!-- one-time setup of the admin account -->
+  <form id="setupForm" class="hidden" autocomplete="off">
+    <p class="sub" style="margin:0">Only the admin email can do this, once.</p>
+    <label for="sEmail">Admin email</label>
+    <div class="inp"><input id="sEmail" type="email" autocomplete="email" required></div>
+    <label for="sPw">Choose a strong password (12+ characters)</label>
+    <div class="inp"><input id="sPw" type="password" autocomplete="new-password" minlength="12" required>
+      <button type="button" class="eye" data-eye="sPw" aria-label="Show password">👁️</button></div>
+    <label for="sPw2">Type it again</label>
+    <div class="inp"><input id="sPw2" type="password" autocomplete="new-password" minlength="12" required></div>
+    <button class="btn purple" id="setupBtn">Create admin account</button>
+    <div class="msg" id="smsg" role="alert"></div>
+    <a class="back" id="backLink">← Back to log in</a>
+  </form>
+</main>
+
+<script>
+const $=s=>document.querySelector(s);
+const show=(el,txt,ok)=>{ el.textContent=txt; el.className='msg '+(ok?'ok':'err'); };
+const busy=(b,on,txt)=>{ b.disabled=on; if(txt) b.textContent=txt; };
+
+// a message left by the app (e.g. "your account is switched off")
+try{ const m=sessionStorage.getItem('eg_login_msg'); if(m){ show($('#msg'),m,false); sessionStorage.removeItem('eg_login_msg'); } }catch(e){}
+
+// the contact number can be changed by the admin at any time
+EG.db.ref('site/contact').once('value').then(s=>{ const c=s.val(); if(!c) return; const d=String(c.whatsapp||'').replace(/\D/g,''); if(!/^\d{8,15}$/.test(d)) return;
+  $('#waLink').href='https://wa.me/'+d+'?text='+encodeURIComponent('Hi! I would like to join English Genius.'); $('#waNum').textContent=String(c.phone||'').replace(/[^\d+ ()-]/g,''); }).catch(()=>{});
+
+let leaving=false;
+EG.auth.onAuthStateChanged(u=>{ if(u && !leaving && !$('#setupForm').offsetParent) location.replace('index.html'); });
+
+document.querySelectorAll('[data-eye]').forEach(b=>b.addEventListener('click',()=>{ const i=$('#'+b.dataset.eye); i.type=i.type==='password'?'text':'password'; }));
+
+$('#loginForm').addEventListener('submit',async e=>{
+  e.preventDefault(); const b=$('#goBtn'); busy(b,true,'Checking…'); $('#msg').className='msg';
+  try{
+    // students stay signed in on their own device; the app logs them out after a quiet spell
+    await EG.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    let email=EG.toEmail($('#who').value);
+    // a username points at its current login (it changes when the teacher sets a new password)
+    if(!$('#who').value.includes('@')){ try{ const m=(await EG.db.ref('logins/'+EG.cleanUsername($('#who').value)).once('value')).val(); if(m) email=m; }catch(e){} }
+    await EG.auth.signInWithEmailAndPassword(email, $('#pw').value);
+    leaving=true; location.replace('index.html');
+  }catch(err){ show($('#msg'),EG.errText(err),false); busy(b,false,"Let's go! 🚀"); $('#pw').value=''; }
+});
+
+$('#forgotLink').addEventListener('click',async()=>{
+  const who=$('#who').value.trim();
+  if(!who.includes('@')){ show($('#msg'),'Students: ask your teacher to reset your password. Teachers: type your email above first.',false); return; }
+  try{ await EG.auth.sendPasswordResetEmail(who); }catch(err){}
+  // the same answer either way, so this box can't be used to discover which emails exist
+  show($('#msg'),'If that email has an account, a reset link is on its way.',true);
+});
+
+$('#setupLink').addEventListener('click',()=>{ $('#loginForm').classList.add('hidden'); $('#setupForm').classList.remove('hidden'); $('#sub').textContent='Teacher setup'; });
+$('#backLink').addEventListener('click',()=>{ $('#setupForm').classList.add('hidden'); $('#loginForm').classList.remove('hidden'); $('#sub').textContent='Log in to play, learn and win stars!'; });
+
+$('#setupForm').addEventListener('submit',async e=>{
+  e.preventDefault(); const m=$('#smsg'), b=$('#setupBtn');
+  const email=$('#sEmail').value.trim().toLowerCase();
+  if(email!==EG.ADMIN_EMAIL){ show(m,'This email is not the admin email for English Genius.',false); return; }
+  if($('#sPw').value.length<12){ show(m,'Use at least 12 characters for the admin password.',false); return; }
+  if($('#sPw').value!==$('#sPw2').value){ show(m,'The two passwords are different.',false); return; }
+  busy(b,true,'Creating…');
+  try{
+    const cred=await EG.auth.createUserWithEmailAndPassword(email,$('#sPw').value);
+    await cred.user.sendEmailVerification();
+    show(m,'Admin account created! Open the email we just sent to '+email+' and click the link to verify it, then log in.',true);
+    await EG.auth.signOut(); busy(b,false,'Create admin account');
+  }catch(err){
+    show(m, err.code==='auth/email-already-in-use' ? 'The admin account already exists — go back and log in (or use "Forgot password?").' : EG.errText(err), false);
+    busy(b,false,'Create admin account');
+  }
+});
+</script>
+</body>
+</html>
